@@ -153,5 +153,4 @@ with tab2:
         else:
             st.success(f"✅ Not likely to churn (Prob: {100 - prob:.1f}%)")
 
-# Footer
-st.markdown("<div class='footer'>Built with ❤️ by Sudhakardamarasingi</div>", unsafe_allow_html=True)
+
