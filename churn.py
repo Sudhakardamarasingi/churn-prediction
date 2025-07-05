@@ -1,23 +1,47 @@
 # churn.py
 import streamlit as st
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+import plotly.express as px
 import pickle
 
 # Page config
-st.set_page_config(page_title="📊 Churn Prediction Dashboard", page_icon="📊", layout="wide")
+st.set_page_config(page_title="📊 Churn Dashboard", page_icon="📊", layout="wide")
 
-# Custom CSS for pro look
-st.markdown("""
-    <style>
-    body { background-color: #fafafa; }
-    .stApp { background-color: #ffffff; }
-    .big-font { font-size:22px !important; }
-    .metric { font-size: 26px; font-weight: bold; color: #4e79a7; }
-    .footer { color: gray; text-align: center; font-size: 14px; margin-top: 50px; }
-    </style>
-    """, unsafe_allow_html=True)
+# Sidebar theme toggle
+theme = st.sidebar.selectbox("🎨 Choose Theme", ["Light", "Dark"])
+
+if theme == "Dark":
+    primaryColor = "#0d1117"
+    textColor = "#f0f6fc"
+    bgColor = "#161b22"
+else:
+    primaryColor = "#ffffff"
+    textColor = "#000000"
+    bgColor = "#f9f9f9"
+
+# Custom CSS
+st.markdown(f"""
+<style>
+body {{
+    background-color: {bgColor};
+    color: {textColor};
+}}
+.stApp {{
+    background-color: {bgColor};
+}}
+.big-title {{
+    font-size:30px !important;
+    font-weight:bold;
+}}
+.metric-card {{
+    background-color: #ffffff;
+    padding:20px;
+    border-radius:12px;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.1);
+    text-align:center;
+}}
+</style>
+""", unsafe_allow_html=True)
 
 # Load data & model
 @st.cache_data
@@ -33,51 +57,43 @@ def load_model():
 data = load_data()
 model, scaler, model_columns = load_model()
 
-# Sidebar branding
-st.sidebar.title("💡 Churn Insights")
-st.sidebar.caption("Built with ❤️ by Sudhakardamarasingi")
-
 # Header
-st.title("✨ Telecom Churn Prediction Dashboard")
-st.caption("Analyze churn trends & predict customer churn with a single click.")
+st.markdown("<div class='big-title'>📊 Telecom Churn Prediction Dashboard</div>", unsafe_allow_html=True)
+st.caption("Professional dashboard to explore churn trends and predict churn risk.")
 
-# Top KPIs
+# Metrics
 churn_rate = (data['Churn'].value_counts(normalize=True) * 100).get('Yes', 0)
 col1, col2, col3 = st.columns(3)
-col1.metric("📉 Overall Churn Rate", f"{churn_rate:.1f}%")
-col2.metric("📦 Total Customers", f"{len(data):,}")
-col3.metric("💲 Avg Monthly Charges", f"${data['MonthlyCharges'].mean():.2f}")
+with col1:
+    st.markdown(f"<div class='metric-card'><h3>📉 Churn Rate</h3><h2>{churn_rate:.1f}%</h2></div>", unsafe_allow_html=True)
+with col2:
+    st.markdown(f"<div class='metric-card'><h3>👥 Total Customers</h3><h2>{len(data):,}</h2></div>", unsafe_allow_html=True)
+with col3:
+    st.markdown(f"<div class='metric-card'><h3>💲 Avg Monthly</h3><h2>${data['MonthlyCharges'].mean():.2f}</h2></div>", unsafe_allow_html=True)
 
 # Tabs
-tab1, tab2 = st.tabs(["📊 EDA & Insights", "🔮 Predict Churn"])
+tab1, tab2 = st.tabs(["📈 EDA & Insights", "🔮 Predict Churn"])
 
 with tab1:
     st.subheader("✅ Churn Distribution")
-    fig, ax = plt.subplots()
-    sns.countplot(x='Churn', data=data, palette=['#FF6B6B','#4ECDC4'], ax=ax)
-    ax.set_ylabel('Count')
-    st.pyplot(fig)
+    fig1 = px.histogram(data, x='Churn', color='Churn', color_discrete_sequence=['#FF6B6B','#4ECDC4'])
+    st.plotly_chart(fig1, use_container_width=True)
 
     st.subheader("💳 Churn by Payment Method")
-    churn_by_payment = data.groupby('PaymentMethod')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
-    churn_by_payment = churn_by_payment.sort_values()
-    fig, ax = plt.subplots()
-    sns.barplot(x=churn_by_payment, y=churn_by_payment.index, palette='coolwarm', ax=ax)
-    ax.set_xlabel('Churn Rate (%)')
-    st.pyplot(fig)
+    churn_rate_payment = data.groupby('PaymentMethod')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
+    fig2 = px.bar(churn_rate_payment.sort_values(), orientation='h', color=churn_rate_payment,
+                  color_continuous_scale='blues', labels={'value':'Churn Rate (%)'}, title="Churn by Payment Method")
+    st.plotly_chart(fig2, use_container_width=True)
 
     st.subheader("📑 Churn by Contract Type")
-    churn_by_contract = data.groupby('Contract')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
-    fig, ax = plt.subplots()
-    sns.barplot(x=churn_by_contract.index, y=churn_by_contract.values, palette='viridis', ax=ax)
-    ax.set_ylabel('Churn Rate (%)')
-    st.pyplot(fig)
-
-    st.markdown("### ✏️ **Insights:**")
-    st.markdown("- Highest churn with month-to-month contracts.\n- Electronic check payments have higher churn.\n- Long-term contracts reduce churn risk.")
+    churn_rate_contract = data.groupby('Contract')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
+    fig3 = px.bar(churn_rate_contract, x=churn_rate_contract.index, y=churn_rate_contract.values,
+                  color=churn_rate_contract.values, color_continuous_scale='teal',
+                  labels={'y':'Churn Rate (%)'}, title="Churn by Contract Type")
+    st.plotly_chart(fig3, use_container_width=True)
 
 with tab2:
-    st.subheader("🔮 Predict if a customer will churn")
+    st.subheader("🔮 Predict if customer will churn")
     with st.form("predict_form"):
         c1, c2 = st.columns(2)
         with c1:
@@ -88,10 +104,10 @@ with tab2:
             contract = st.selectbox('Contract Type', ['Month-to-month', 'One year', 'Two year'])
             payment = st.selectbox('Payment Method', ['Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)'])
             internet = st.selectbox('Internet Service', ['DSL', 'Fiber optic', 'No'])
-        predict_btn = st.form_submit_button('✅ Predict Now')
+        btn = st.form_submit_button("✅ Predict")
 
-    if predict_btn:
-        input_data = pd.DataFrame({
+    if btn:
+        input_df = pd.DataFrame({
             'tenure': [tenure],
             'MonthlyCharges': [monthly],
             'TotalCharges': [total],
@@ -99,33 +115,17 @@ with tab2:
             f'PaymentMethod_{payment}': [1],
             f'InternetService_{internet}': [1]
         })
-
-        # Add missing columns
         for col in model_columns:
-            if col not in input_data:
-                input_data[col] = 0
-        input_data = input_data[model_columns]
-
-        input_scaled = scaler.transform(input_data)
-        pred = model.predict(input_scaled)[0]
-        prob = model.predict_proba(input_scaled)[0][1]*100
-
+            if col not in input_df:
+                input_df[col] = 0
+        input_df = input_df[model_columns]
+        pred = model.predict(scaler.transform(input_df))[0]
+        prob = model.predict_proba(scaler.transform(input_df))[0][1]*100
         if pred == 1:
-            st.error(f"⚠️ Customer likely to churn! (Prob: {prob:.1f}%)")
+            st.error(f"⚠️ Likely to churn! (Prob: {prob:.1f}%)")
         else:
-            st.success(f"✅ Customer unlikely to churn. (Prob: {100 - prob:.1f}%)")
-
-    st.markdown("---")
-    st.subheader("📊 Feature Importance (Top 5)")
-    importances = model.feature_importances_
-    feat_df = pd.DataFrame({'feature': model_columns, 'importance': importances})
-    feat_df = feat_df.sort_values('importance', ascending=False).head(5)
-    fig, ax = plt.subplots()
-    sns.barplot(x='importance', y='feature', data=feat_df, palette='coolwarm', ax=ax)
-    st.pyplot(fig)
+            st.success(f"✅ Not likely to churn (Prob: {100 - prob:.1f}%)")
 
 # Footer
-st.markdown("<div class='footer'>Built with Streamlit & ❤️ by Sudhakardamarasingi</div>", unsafe_allow_html=True)
-
-
+st.markdown(f"<div style='text-align:center; color:gray; margin-top:40px;'>Built with ❤️ by Sudhakardamarasingi</div>", unsafe_allow_html=True)
 
