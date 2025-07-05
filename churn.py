@@ -1,4 +1,4 @@
-# app.py
+# churn.py
 import streamlit as st
 import pandas as pd
 import seaborn as sns
@@ -6,10 +6,12 @@ import matplotlib.pyplot as plt
 import pickle
 import numpy as np
 
+# Page config & style
 st.set_page_config(page_title="📊 Telecom Churn Dashboard", layout="wide")
 sns.set(style='whitegrid')
 plt.rcParams['figure.figsize'] = (8, 5)
 
+# Load data and model
 @st.cache_data
 def load_data():
     return pd.read_csv('churn_dataset.csv')
@@ -23,18 +25,22 @@ def load_advanced_model():
 data = load_data()
 model, scaler, model_columns = load_advanced_model()
 
-# Title
-st.title("📊 Telecom Customer Churn Dashboard")
-st.caption("Explore churn patterns, predict churn, and understand why.")
+# Sidebar branding
+st.sidebar.title("📊 Churn Dashboard")
+st.sidebar.caption("Analyze, predict & act on customer churn.")
 
-# Metric
+# Main title & intro
+st.title("✨ Telecom Customer Churn Dashboard")
+st.markdown("Use the dashboard below to explore churn trends and predict churn risk for new customers.")
+
+# Key metric
 churn_rate = (data['Churn'].value_counts(normalize=True) * 100).get('Yes', 0)
 st.metric("📉 Overall Churn Rate", f"{churn_rate:.2f} %")
 
 # Tabs
-tab_viz, tab_predict = st.tabs(["📈 Analysis & Insights", "🔮 Predict Churn"])
+tab1, tab2 = st.tabs(["📈 EDA & Insights", "🔮 Predict Churn"])
 
-with tab_viz:
+with tab1:
     st.subheader("✅ Churn Distribution")
     churn_counts = data['Churn'].value_counts()
     fig, ax = plt.subplots()
@@ -59,60 +65,58 @@ with tab_viz:
     st.pyplot(fig)
 
     st.markdown("---")
-    st.markdown("### ✏️ **Key Business Insights**")
+    st.markdown("### ✏️ **Key Insights:**")
     st.markdown("""
-    - Highest churn for month-to-month contracts & electronic check payments.
-    - Higher monthly & total charges linked to churn.
-    - Short-tenure customers churn more.
+    - Month-to-month contracts and electronic checks see the highest churn.
+    - Short tenure customers churn significantly more.
+    - Higher charges can be an indicator, but contract type matters more.
     """)
 
-with tab_predict:
+with tab2:
     st.subheader("🔮 Predict Customer Churn")
 
-    st.markdown("Enter customer details below:")
+    with st.form("prediction_form"):
+        col1, col2 = st.columns(2)
+        with col1:
+            tenure = st.slider('Tenure (months)', 0, 100, 12)
+            monthly = st.number_input('Monthly Charges', 0.0, 200.0, 70.0)
+            total = st.number_input('Total Charges', 0.0, 10000.0, 2500.0)
+        with col2:
+            contract = st.selectbox('Contract Type', ['Month-to-month', 'One year', 'Two year'])
+            payment = st.selectbox('Payment Method', [
+                'Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)'
+            ])
+            internet = st.selectbox('Internet Service', ['DSL', 'Fiber optic', 'No'])
 
-    # Better UI inputs
-    col1, col2 = st.columns(2)
-    with col1:
-        tenure = st.slider('Tenure (months)', min_value=0, max_value=100, value=12)
-        monthly = st.number_input('Monthly Charges', min_value=0.0, max_value=200.0, value=70.0)
-        total = st.number_input('Total Charges', min_value=0.0, max_value=10000.0, value=2500.0)
-    with col2:
-        contract = st.selectbox('Contract Type', ['Month-to-month', 'One year', 'Two year'])
-        payment = st.selectbox('Payment Method', [
-            'Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)'
-        ])
-        internet = st.selectbox('Internet Service', ['DSL', 'Fiber optic', 'No'])
+        submitted = st.form_submit_button('Predict')
 
-    # Build input dataframe
-    input_data = pd.DataFrame({
-        'tenure': [tenure],
-        'MonthlyCharges': [monthly],
-        'TotalCharges': [total],
-        f'Contract_{contract}': [1],
-        f'PaymentMethod_{payment}': [1],
-        f'InternetService_{internet}': [1]
-    })
+    if submitted:
+        input_data = pd.DataFrame({
+            'tenure': [tenure],
+            'MonthlyCharges': [monthly],
+            'TotalCharges': [total],
+            f'Contract_{contract}': [1],
+            f'PaymentMethod_{payment}': [1],
+            f'InternetService_{internet}': [1]
+        })
 
-    # Add missing columns
-    for col in model_columns:
-        if col not in input_data.columns:
-            input_data[col] = 0
-    input_data = input_data[model_columns]
+        # Add missing cols
+        for col in model_columns:
+            if col not in input_data.columns:
+                input_data[col] = 0
+        input_data = input_data[model_columns]
 
-    # Scale
-    input_scaled = scaler.transform(input_data)
-
-    # Predict
-    if st.button('Predict'):
+        # Predict
+        input_scaled = scaler.transform(input_data)
         pred = model.predict(input_scaled)[0]
         prob = model.predict_proba(input_scaled)[0][1]*100
+
         if pred == 1:
             st.error(f"⚠️ Likely to churn! (Probability: {prob:.1f}%)")
         else:
             st.success(f"✅ Not likely to churn (Probability: {100 - prob:.1f}%)")
 
-        # Show feature importance
+        # Feature importance
         st.subheader("📊 Feature Importance (Top 5)")
         importances = model.feature_importances_
         feat_df = pd.DataFrame({'feature': model_columns, 'importance': importances})
@@ -122,6 +126,11 @@ with tab_predict:
         ax.invert_yaxis()
         ax.set_xlabel('Importance')
         st.pyplot(fig)
+
+st.markdown("---")
+st.caption("Built by Sudhakardamarasingi")
+
+
 
 st.markdown("---")
 
