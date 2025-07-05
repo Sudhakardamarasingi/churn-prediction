@@ -1,6 +1,121 @@
-# Sidebar navigation
+# churn.py
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import pickle
+
+# Page config
+st.set_page_config(page_title="⚡ Telecom Churn Dashboard", page_icon="⚡", layout="wide")
+
+# Dark theme colors
+primary_bg = "#0d1117"
+card_bg = "#161b22"
+text_color = "#f0f6fc"
+accent = "#00e1ff"
+shadow = "0px 0px 10px rgba(0,225,255,0.5)"
+
+# Custom CSS
+st.markdown(f"""
+<style>
+body, .stApp {{
+    background-color: {primary_bg};
+    color: {text_color};
+}}
+.big-title {{
+    font-size:32px !important;
+    font-weight:bold;
+    color: {accent};
+}}
+.subtitle {{
+    font-size:18px;
+    color: #9ca3af;
+    margin-bottom: 20px;
+}}
+.metric-card {{
+    background-color: {card_bg};
+    padding:20px;
+    border-radius:12px;
+    box-shadow: 0 0 10px rgba(0,225,255,0.2);
+    text-align:center;
+}}
+.pred-card {{
+    background-color: {card_bg};
+    padding:15px 20px;
+    border-radius:12px;
+    margin-bottom:10px;
+    border: 1px solid {accent};
+    box-shadow: {shadow};
+}}
+.result-card {{
+    background-color: {card_bg};
+    padding:15px 20px;
+    border-radius:12px;
+    margin-top:20px;
+    border: 1px solid {accent};
+    box-shadow: {shadow};
+}}
+.big-btn > button {{
+    background-color: {accent};
+    color: black;
+    width: 100%;
+    padding: 0.75em;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+}}
+.footer {{
+    color: gray;
+    text-align: center;
+    font-size: 13px;
+    margin-top: 40px;
+}}
+a.footer-link {{
+    color: #9ca3af;
+    text-decoration: none;
+}}
+</style>
+""", unsafe_allow_html=True)
+
+# Sidebar branding
+with st.sidebar:
+    st.markdown("## ⚡ Sudhakardamarasingi")
+    st.markdown("Customer Churn Prediction App")
+    st.markdown("[View on GitHub](https://github.com/Sudhakardamarasingi/churn-prediction)")
+
+# Load data & model
+@st.cache_data
+def load_data():
+    return pd.read_csv('churn_dataset.csv')
+
+@st.cache_resource
+def load_model():
+    with open('advanced_churn_model.pkl', 'rb') as f:
+        model, scaler, columns = pickle.load(f)
+    return model, scaler, columns
+
+data = load_data()
+model, scaler, model_columns = load_model()
+
+# Sidebar navigation (move AFTER load to avoid NameError)
 page = st.sidebar.radio("Navigation", ["🏠 Home", "📊 Insights"])
 
+# Header
+st.markdown(f"<div class='big-title'>⚡ Telecom Customer Churn Dashboard</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Understand why customers churn & predict risk instantly.</div>", unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Metrics
+churn_rate = (data['Churn'].value_counts(normalize=True) * 100).get('Yes', 0)
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.markdown(f"<div class='metric-card'><h4>📉 Churn Rate</h4><h2>{churn_rate:.1f}%</h2></div>", unsafe_allow_html=True)
+with col2:
+    st.markdown(f"<div class='metric-card'><h4>👥 Total Customers</h4><h2>{len(data):,}</h2></div>", unsafe_allow_html=True)
+with col3:
+    st.markdown(f"<div class='metric-card'><h4>💲 Avg Monthly</h4><h2>${data['MonthlyCharges'].mean():.2f}</h2></div>", unsafe_allow_html=True)
+
+# Pages
 if page == "🏠 Home":
     st.subheader("🔮 Predict if customer will churn")
     with st.form("predict_form"):
@@ -24,7 +139,7 @@ if page == "🏠 Home":
             st.markdown("<div class='pred-card'>🌐 Internet Service</div>", unsafe_allow_html=True)
             internet = st.selectbox('', ['DSL', 'Fiber optic', 'No'])
 
-        predict_btn = st.form_submit_button("🚀 Predict Customer Churn Risk")  # bigger, bolder text
+        predict_btn = st.form_submit_button("🚀 Predict Customer Churn Risk")
 
     if predict_btn:
         input_df = pd.DataFrame({
@@ -71,3 +186,8 @@ elif page == "📊 Insights":
     fig3 = px.bar(x=churn_contract.index, y=churn_contract.values, color=churn_contract.values, color_continuous_scale='teal')
     fig3.update_layout(paper_bgcolor=primary_bg, plot_bgcolor=primary_bg, font_color=text_color)
     st.plotly_chart(fig3, use_container_width=True)
+
+# Footer
+st.markdown("<div class='footer'>Built with ❤️ by Sudhakardamarasingi | "
+            "<a class='footer-link' href='https://github.com/Sudhakardamarasingi/churn-prediction'>GitHub Repo</a></div>", 
+            unsafe_allow_html=True)
