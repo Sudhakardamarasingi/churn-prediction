@@ -59,7 +59,8 @@ body, .stApp {{
     color: black;
     width: 100%;
     padding: 0.75em;
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: bold;
     border-radius: 8px;
 }}
 .footer {{
@@ -74,6 +75,12 @@ a.footer-link {{
 }}
 </style>
 """, unsafe_allow_html=True)
+
+# Sidebar branding
+with st.sidebar:
+    st.markdown("## ⚡ Sudhakardamarasingi")
+    st.markdown("Customer Churn Prediction App")
+    st.markdown("[View on GitHub](https://github.com/Sudhakardamarasingi/churn-prediction)")
 
 # Load data & model
 @st.cache_data
@@ -93,6 +100,9 @@ model, scaler, model_columns = load_model()
 st.markdown(f"<div class='big-title'>⚡ Telecom Customer Churn Dashboard</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Understand why customers churn & predict risk instantly.</div>", unsafe_allow_html=True)
 
+# Add spacing under header
+st.markdown("<br>", unsafe_allow_html=True)
+
 # Metrics
 churn_rate = (data['Churn'].value_counts(normalize=True) * 100).get('Yes', 0)
 col1, col2, col3 = st.columns(3)
@@ -104,25 +114,27 @@ with col3:
     st.markdown(f"<div class='metric-card'><h4>💲 Avg Monthly</h4><h2>${data['MonthlyCharges'].mean():.2f}</h2></div>", unsafe_allow_html=True)
 
 # Tabs
-tab1, tab2 = st.tabs(["📊 EDA & Insights", "🔮 Predict Churn"])
+tab1, tab2 = st.tabs(["📊 Insights", "🔮 Predict Churn"])
 
 with tab1:
-    st.subheader("✅ Churn Distribution")
-    fig1 = px.histogram(data, x='Churn', color='Churn', color_discrete_sequence=['#FF6B6B','#4ECDC4'])
-    fig1.update_layout(paper_bgcolor=primary_bg, plot_bgcolor=primary_bg, font_color=text_color)
-    st.plotly_chart(fig1, use_container_width=True)
+    show_plots = st.checkbox("📊 Show Insights")
+    if show_plots:
+        st.subheader("✅ Churn Distribution")
+        fig1 = px.histogram(data, x='Churn', color='Churn', color_discrete_sequence=['#FF6B6B','#4ECDC4'])
+        fig1.update_layout(paper_bgcolor=primary_bg, plot_bgcolor=primary_bg, font_color=text_color)
+        st.plotly_chart(fig1, use_container_width=True)
 
-    st.subheader("💳 Churn by Payment Method")
-    churn_payment = data.groupby('PaymentMethod')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
-    fig2 = px.bar(churn_payment.sort_values(), orientation='h', color=churn_payment, color_continuous_scale='blues')
-    fig2.update_layout(paper_bgcolor=primary_bg, plot_bgcolor=primary_bg, font_color=text_color)
-    st.plotly_chart(fig2, use_container_width=True)
+        st.subheader("💳 Churn by Payment Method")
+        churn_payment = data.groupby('PaymentMethod')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
+        fig2 = px.bar(churn_payment.sort_values(), orientation='h', color=churn_payment, color_continuous_scale='blues')
+        fig2.update_layout(paper_bgcolor=primary_bg, plot_bgcolor=primary_bg, font_color=text_color)
+        st.plotly_chart(fig2, use_container_width=True)
 
-    st.subheader("📑 Churn by Contract Type")
-    churn_contract = data.groupby('Contract')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
-    fig3 = px.bar(x=churn_contract.index, y=churn_contract.values, color=churn_contract.values, color_continuous_scale='teal')
-    fig3.update_layout(paper_bgcolor=primary_bg, plot_bgcolor=primary_bg, font_color=text_color)
-    st.plotly_chart(fig3, use_container_width=True)
+        st.subheader("📑 Churn by Contract Type")
+        churn_contract = data.groupby('Contract')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
+        fig3 = px.bar(x=churn_contract.index, y=churn_contract.values, color=churn_contract.values, color_continuous_scale='teal')
+        fig3.update_layout(paper_bgcolor=primary_bg, plot_bgcolor=primary_bg, font_color=text_color)
+        st.plotly_chart(fig3, use_container_width=True)
 
 with tab2:
     st.subheader("🔮 Predict if customer will churn")
@@ -147,7 +159,7 @@ with tab2:
             st.markdown("<div class='pred-card'>🌐 Internet Service</div>", unsafe_allow_html=True)
             internet = st.selectbox('', ['DSL', 'Fiber optic', 'No'])
 
-        predict_btn = st.form_submit_button("✨ Predict Now")
+        predict_btn = st.form_submit_button("🚀 Predict Customer Churn Risk")  # bigger, bolder text
 
     if predict_btn:
         input_df = pd.DataFrame({
