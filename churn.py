@@ -26,6 +26,11 @@ body, .stApp {{
     font-weight:bold;
     color: {accent};
 }}
+.subtitle {{
+    font-size:18px;
+    color: #9ca3af;
+    margin-bottom: 20px;
+}}
 .metric-card {{
     background-color: {card_bg};
     padding:20px;
@@ -38,6 +43,14 @@ body, .stApp {{
     padding:15px 20px;
     border-radius:12px;
     margin-bottom:10px;
+    border: 1px solid {accent};
+    box-shadow: {shadow};
+}}
+.result-card {{
+    background-color: {card_bg};
+    padding:15px 20px;
+    border-radius:12px;
+    margin-top:20px;
     border: 1px solid {accent};
     box-shadow: {shadow};
 }}
@@ -54,6 +67,10 @@ body, .stApp {{
     text-align: center;
     font-size: 13px;
     margin-top: 40px;
+}}
+a.footer-link {{
+    color: #9ca3af;
+    text-decoration: none;
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -74,7 +91,7 @@ model, scaler, model_columns = load_model()
 
 # Header
 st.markdown(f"<div class='big-title'>⚡ Telecom Customer Churn Dashboard</div>", unsafe_allow_html=True)
-st.caption("Premium dark dashboard to explore churn and predict with neon-style input cards.")
+st.markdown("<div class='subtitle'>Understand why customers churn & predict risk instantly.</div>", unsafe_allow_html=True)
 
 # Metrics
 churn_rate = (data['Churn'].value_counts(normalize=True) * 100).get('Yes', 0)
@@ -109,7 +126,6 @@ with tab1:
 
 with tab2:
     st.subheader("🔮 Predict if customer will churn")
-
     with st.form("predict_form"):
         c1, c2 = st.columns(2)
         with c1:
@@ -149,16 +165,18 @@ with tab2:
         pred = model.predict(scaler.transform(input_df))[0]
         prob = model.predict_proba(scaler.transform(input_df))[0][1]*100
 
-        # Human-friendly output
+        st.markdown("<div class='result-card'><h4>📊 Prediction Result</h4>", unsafe_allow_html=True)
         if prob > 70:
-            st.error(f"⚠ **High churn risk!** Estimated risk: **{prob:.1f}%**.\n\n"
-                     f"👉 Customer likely to churn. Consider offering a loyalty discount or contacting them proactively.")
+            st.markdown(f"<div class='result-card'>⚠ **High churn risk!** Estimated risk: **{prob:.1f}%**.<br>"
+                        f"👉 Customer likely to churn. Consider loyalty discount or proactive contact.</div>", unsafe_allow_html=True)
         elif prob > 40:
-            st.warning(f"⚠ **Medium churn risk**: **{prob:.1f}%**.\n\n"
-                       f"👉 Keep an eye on this customer, consider engagement strategies.")
+            st.markdown(f"<div class='result-card'>⚠ **Medium churn risk**: **{prob:.1f}%**.<br>"
+                        f"👉 Consider engagement strategies.</div>", unsafe_allow_html=True)
         else:
-            st.success(f"✅ **Low churn risk**: **{prob:.1f}%**.\n\n"
-                       f"Customer likely to stay. Continue with current retention approach.")
+            st.markdown(f"<div class='result-card'>✅ **Low churn risk**: **{prob:.1f}%**.<br>"
+                        f"Customer likely to stay. Continue current retention approach.</div>", unsafe_allow_html=True)
 
 # Footer
-st.markdown("<div class='footer'>Built with ❤️ by Sudhakardamarasingi</div>", unsafe_allow_html=True)
+st.markdown("<div class='footer'>Built with ❤️ by Sudhakardamarasingi | "
+            "<a class='footer-link' href='https://github.com/Sudhakardamarasingi/churn-prediction'>GitHub Repo</a></div>", 
+            unsafe_allow_html=True)
