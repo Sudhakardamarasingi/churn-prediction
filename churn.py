@@ -159,13 +159,13 @@ if page == "🏠 Home":
 
         st.markdown("<div class='result-card'><h4>📊 Prediction Result</h4>", unsafe_allow_html=True)
         if prob > 70:
-            st.markdown(f"<div class='result-card'>⚠ **High churn risk!** Estimated risk: **{prob:.1f}%**.<br>"
+            st.markdown(f"<div class='result-card'>⚠ High churn risk! Estimated risk: {prob:.1f}.<br>"
                         f"👉 Customer likely to churn. Consider loyalty discount or proactive contact.</div>", unsafe_allow_html=True)
         elif prob > 40:
-            st.markdown(f"<div class='result-card'>⚠ **Medium churn risk**: **{prob:.1f}%**.<br>"
+            st.markdown(f"<div class='result-card'>⚠ Medium churn risk: {prob:.1f}.<br>"
                         f"👉 Consider engagement strategies.</div>", unsafe_allow_html=True)
         else:
-            st.markdown(f"<div class='result-card'>✅ **Low churn risk**: **{prob:.1f}%**.<br>"
+            st.markdown(f"<div class='result-card'>✅ Low churn risk: {prob:.1f}.<br>"
                         f"Customer likely to stay. Continue current retention approach.</div>", unsafe_allow_html=True)
 
 elif page == "📊 Insights":
