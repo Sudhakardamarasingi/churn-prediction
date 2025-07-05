@@ -5,7 +5,7 @@ import plotly.express as px
 import pickle
 
 # Page config
-st.set_page_config(page_title="Telecom Churn Dashboard", page_icon="bbbb", layout="wide")
+st.set_page_config(page_title="⚡ Telecom Churn Dashboard", page_icon="⚡", layout="wide")
 
 # Dark theme colors
 primary_bg = "#0d1117"
@@ -78,7 +78,7 @@ a.footer-link {{
 
 # Sidebar branding
 with st.sidebar:
-    st.markdown("## Sudhakardamarasingi")
+    st.markdown("## ⚡ Sudhakardamarasingi")
     st.markdown("Customer Churn Prediction App")
     st.markdown("[View on GitHub](https://github.com/Sudhakardamarasingi/churn-prediction)")
 
