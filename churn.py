@@ -4,93 +4,93 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pickle
-import numpy as np
 
-# Page config & style
-st.set_page_config(page_title="📊 Telecom Churn Dashboard", layout="wide")
-sns.set(style='whitegrid')
-plt.rcParams['figure.figsize'] = (8, 5)
+# Page config
+st.set_page_config(page_title="📊 Churn Prediction Dashboard", page_icon="📊", layout="wide")
 
-# Load data and model
+# Custom CSS for pro look
+st.markdown("""
+    <style>
+    body { background-color: #fafafa; }
+    .stApp { background-color: #ffffff; }
+    .big-font { font-size:22px !important; }
+    .metric { font-size: 26px; font-weight: bold; color: #4e79a7; }
+    .footer { color: gray; text-align: center; font-size: 14px; margin-top: 50px; }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Load data & model
 @st.cache_data
 def load_data():
     return pd.read_csv('churn_dataset.csv')
 
 @st.cache_resource
-def load_advanced_model():
+def load_model():
     with open('advanced_churn_model.pkl', 'rb') as f:
         model, scaler, columns = pickle.load(f)
     return model, scaler, columns
 
 data = load_data()
-model, scaler, model_columns = load_advanced_model()
+model, scaler, model_columns = load_model()
 
 # Sidebar branding
-st.sidebar.title("📊 Churn Dashboard")
-st.sidebar.caption("Analyze, predict & act on customer churn.")
+st.sidebar.title("💡 Churn Insights")
+st.sidebar.caption("Built with ❤️ by Sudhakardamarasingi")
 
-# Main title & intro
-st.title("✨ Telecom Customer Churn Dashboard")
-st.markdown("Use the dashboard below to explore churn trends and predict churn risk for new customers.")
+# Header
+st.title("✨ Telecom Churn Prediction Dashboard")
+st.caption("Analyze churn trends & predict customer churn with a single click.")
 
-# Key metric
+# Top KPIs
 churn_rate = (data['Churn'].value_counts(normalize=True) * 100).get('Yes', 0)
-st.metric("📉 Overall Churn Rate", f"{churn_rate:.2f} %")
+col1, col2, col3 = st.columns(3)
+col1.metric("📉 Overall Churn Rate", f"{churn_rate:.1f}%")
+col2.metric("📦 Total Customers", f"{len(data):,}")
+col3.metric("💲 Avg Monthly Charges", f"${data['MonthlyCharges'].mean():.2f}")
 
 # Tabs
-tab1, tab2 = st.tabs(["📈 EDA & Insights", "🔮 Predict Churn"])
+tab1, tab2 = st.tabs(["📊 EDA & Insights", "🔮 Predict Churn"])
 
 with tab1:
     st.subheader("✅ Churn Distribution")
-    churn_counts = data['Churn'].value_counts()
     fig, ax = plt.subplots()
-    bars = ax.bar(churn_counts.index, churn_counts.values, color=['#FF6B6B','#4ECDC4'])
-    ax.bar_label(bars)
-    st.pyplot(fig)
-
-    st.subheader("📑 Churn by Contract Type")
-    churn_rate_contract = data.groupby('Contract')['Churn'].value_counts(normalize=True).unstack().get('Yes',0)*100
-    fig, ax = plt.subplots()
-    bars = ax.bar(churn_rate_contract.index, churn_rate_contract.values, color='#ffa600')
-    ax.bar_label(bars, fmt='%.1f%%')
-    ax.set_ylabel('Churn Rate (%)')
+    sns.countplot(x='Churn', data=data, palette=['#FF6B6B','#4ECDC4'], ax=ax)
+    ax.set_ylabel('Count')
     st.pyplot(fig)
 
     st.subheader("💳 Churn by Payment Method")
-    churn_rate_payment = data.groupby('PaymentMethod')['Churn'].value_counts(normalize=True).unstack().get('Yes',0)*100
-    churn_rate_payment = churn_rate_payment.sort_values(ascending=False)
+    churn_by_payment = data.groupby('PaymentMethod')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
+    churn_by_payment = churn_by_payment.sort_values()
     fig, ax = plt.subplots()
-    bars = ax.barh(churn_rate_payment.index, churn_rate_payment.values, color='#00b4d8')
-    ax.bar_label(bars, fmt='%.1f%%')
+    sns.barplot(x=churn_by_payment, y=churn_by_payment.index, palette='coolwarm', ax=ax)
+    ax.set_xlabel('Churn Rate (%)')
     st.pyplot(fig)
 
-    st.markdown("---")
-    st.markdown("### ✏️ **Key Insights:**")
-    st.markdown("""
-    - Month-to-month contracts and electronic checks see the highest churn.
-    - Short tenure customers churn significantly more.
-    - Higher charges can be an indicator, but contract type matters more.
-    """)
+    st.subheader("📑 Churn by Contract Type")
+    churn_by_contract = data.groupby('Contract')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
+    fig, ax = plt.subplots()
+    sns.barplot(x=churn_by_contract.index, y=churn_by_contract.values, palette='viridis', ax=ax)
+    ax.set_ylabel('Churn Rate (%)')
+    st.pyplot(fig)
+
+    st.markdown("### ✏️ **Insights:**")
+    st.markdown("- Highest churn with month-to-month contracts.\n- Electronic check payments have higher churn.\n- Long-term contracts reduce churn risk.")
 
 with tab2:
-    st.subheader("🔮 Predict Customer Churn")
-
-    with st.form("prediction_form"):
-        col1, col2 = st.columns(2)
-        with col1:
+    st.subheader("🔮 Predict if a customer will churn")
+    with st.form("predict_form"):
+        c1, c2 = st.columns(2)
+        with c1:
             tenure = st.slider('Tenure (months)', 0, 100, 12)
             monthly = st.number_input('Monthly Charges', 0.0, 200.0, 70.0)
             total = st.number_input('Total Charges', 0.0, 10000.0, 2500.0)
-        with col2:
+        with c2:
             contract = st.selectbox('Contract Type', ['Month-to-month', 'One year', 'Two year'])
-            payment = st.selectbox('Payment Method', [
-                'Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)'
-            ])
+            payment = st.selectbox('Payment Method', ['Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)'])
             internet = st.selectbox('Internet Service', ['DSL', 'Fiber optic', 'No'])
+        predict_btn = st.form_submit_button('✅ Predict Now')
 
-        submitted = st.form_submit_button('Predict')
-
-    if submitted:
+    if predict_btn:
         input_data = pd.DataFrame({
             'tenure': [tenure],
             'MonthlyCharges': [monthly],
@@ -100,39 +100,32 @@ with tab2:
             f'InternetService_{internet}': [1]
         })
 
-        # Add missing cols
+        # Add missing columns
         for col in model_columns:
-            if col not in input_data.columns:
+            if col not in input_data:
                 input_data[col] = 0
         input_data = input_data[model_columns]
 
-        # Predict
         input_scaled = scaler.transform(input_data)
         pred = model.predict(input_scaled)[0]
         prob = model.predict_proba(input_scaled)[0][1]*100
 
         if pred == 1:
-            st.error(f"⚠️ Likely to churn! (Probability: {prob:.1f}%)")
+            st.error(f"⚠️ Customer likely to churn! (Prob: {prob:.1f}%)")
         else:
-            st.success(f"✅ Not likely to churn (Probability: {100 - prob:.1f}%)")
+            st.success(f"✅ Customer unlikely to churn. (Prob: {100 - prob:.1f}%)")
 
-        # Feature importance
-        st.subheader("📊 Feature Importance (Top 5)")
-        importances = model.feature_importances_
-        feat_df = pd.DataFrame({'feature': model_columns, 'importance': importances})
-        feat_df = feat_df.sort_values('importance', ascending=False).head(5)
-        fig, ax = plt.subplots()
-        bars = ax.barh(feat_df['feature'], feat_df['importance'], color='#4e79a7')
-        ax.invert_yaxis()
-        ax.set_xlabel('Importance')
-        st.pyplot(fig)
+    st.markdown("---")
+    st.subheader("📊 Feature Importance (Top 5)")
+    importances = model.feature_importances_
+    feat_df = pd.DataFrame({'feature': model_columns, 'importance': importances})
+    feat_df = feat_df.sort_values('importance', ascending=False).head(5)
+    fig, ax = plt.subplots()
+    sns.barplot(x='importance', y='feature', data=feat_df, palette='coolwarm', ax=ax)
+    st.pyplot(fig)
 
-st.markdown("---")
-st.caption("Built by Sudhakardamarasingi")
-
-
-
-st.markdown("---")
+# Footer
+st.markdown("<div class='footer'>Built with Streamlit & ❤️ by Sudhakardamarasingi</div>", unsafe_allow_html=True)
 
 
 
