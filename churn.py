@@ -124,6 +124,6 @@ with tab_predict:
         st.pyplot(fig)
 
 st.markdown("---")
-st.caption("Built with ❤️ using Streamlit & Random Forest")
+
 
 
