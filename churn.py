@@ -5,7 +5,7 @@ import plotly.express as px
 import pickle
 
 # Page config
-st.set_page_config(page_title="📊 Telecom Churn Dashboard", page_icon="📊", layout="wide")
+st.set_page_config(page_title="📊 Churn Dashboard", page_icon="📊", layout="wide")
 
 # Sidebar theme toggle
 theme = st.sidebar.radio("🎨 Choose Theme", ["Light", "Dark"])
@@ -15,14 +15,16 @@ if theme == "Dark":
     primary_bg = "#0d1117"
     card_bg = "#161b22"
     text_color = "#f0f6fc"
-    accent_color = "#3b82f6"
+    accent = "#3b82f6"
+    shadow = "rgba(255,255,255,0.05)"
 else:
-    primary_bg = "#ffffff"
-    card_bg = "#f9f9f9"
+    primary_bg = "#f9fafb"
+    card_bg = "#ffffff"
     text_color = "#000000"
-    accent_color = "#2563eb"
+    accent = "#2563eb"
+    shadow = "rgba(0,0,0,0.1)"
 
-# Custom CSS
+# Custom CSS for cards & inputs
 st.markdown(f"""
 <style>
 body, .stApp {{
@@ -32,14 +34,32 @@ body, .stApp {{
 .big-title {{
     font-size:32px !important;
     font-weight:bold;
-    color: {accent_color};
+    color: {accent};
 }}
 .metric-card {{
     background-color: {card_bg};
     padding:20px;
     border-radius:12px;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0px 2px 8px {shadow};
     text-align:center;
+}}
+.pred-card {{
+    background-color: {card_bg};
+    padding:15px 20px;
+    border-radius:12px;
+    box-shadow: 0px 2px 8px {shadow};
+    margin-bottom:10px;
+}}
+input, select, textarea {{
+    border-radius:8px !important;
+}}
+.big-btn > button {{
+    background-color: {accent};
+    color: white;
+    width: 100%;
+    padding: 0.75em;
+    font-size: 16px;
+    border-radius: 8px;
 }}
 .footer {{
     color: gray;
@@ -64,9 +84,9 @@ def load_model():
 data = load_data()
 model, scaler, model_columns = load_model()
 
-# Hero header
+# Header
 st.markdown(f"<div class='big-title'>📊 Telecom Customer Churn Dashboard</div>", unsafe_allow_html=True)
-st.caption("Explore churn trends & predict risk — modern light/dark dashboard.")
+st.caption("Explore churn trends & predict churn with a modern SaaS interface.")
 
 # Metrics
 churn_rate = (data['Churn'].value_counts(normalize=True) * 100).get('Yes', 0)
@@ -83,38 +103,45 @@ tab1, tab2 = st.tabs(["📊 EDA & Insights", "🔮 Predict Churn"])
 
 with tab1:
     st.subheader("✅ Churn Distribution")
-    fig1 = px.histogram(data, x='Churn', color='Churn',
-                        color_discrete_sequence=['#FF6B6B','#4ECDC4'],
-                        title="Churn Distribution")
+    fig1 = px.histogram(data, x='Churn', color='Churn', color_discrete_sequence=['#FF6B6B','#4ECDC4'])
     st.plotly_chart(fig1, use_container_width=True)
 
     st.subheader("💳 Churn by Payment Method")
     churn_payment = data.groupby('PaymentMethod')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
-    fig2 = px.bar(churn_payment.sort_values(), orientation='h', color=churn_payment,
-                  color_continuous_scale='blues', title="Churn by Payment Method")
+    fig2 = px.bar(churn_payment.sort_values(), orientation='h', color=churn_payment, color_continuous_scale='blues')
     st.plotly_chart(fig2, use_container_width=True)
 
     st.subheader("📑 Churn by Contract Type")
     churn_contract = data.groupby('Contract')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
-    fig3 = px.bar(x=churn_contract.index, y=churn_contract.values, color=churn_contract.values,
-                  color_continuous_scale='teal', labels={'y':'Churn Rate (%)'}, title="Churn by Contract")
+    fig3 = px.bar(x=churn_contract.index, y=churn_contract.values, color=churn_contract.values, color_continuous_scale='teal')
     st.plotly_chart(fig3, use_container_width=True)
 
 with tab2:
-    st.subheader("🔮 Predict if customer will churn")
+    st.subheader("✨ Predict if customer will churn")
     with st.form("predict_form"):
         c1, c2 = st.columns(2)
         with c1:
-            tenure = st.slider('Tenure (months)', 0, 100, 12)
-            monthly = st.number_input('Monthly Charges', 0.0, 200.0, 70.0)
-            total = st.number_input('Total Charges', 0.0, 10000.0, 2500.0)
-        with c2:
-            contract = st.selectbox('Contract Type', ['Month-to-month', 'One year', 'Two year'])
-            payment = st.selectbox('Payment Method', ['Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)'])
-            internet = st.selectbox('Internet Service', ['DSL', 'Fiber optic', 'No'])
-        btn = st.form_submit_button("✅ Predict Now")
+            st.markdown("<div class='pred-card'>📅 Tenure (months)</div>", unsafe_allow_html=True)
+            tenure = st.slider('', 0, 100, 12)
 
-    if btn:
+            st.markdown("<div class='pred-card'>💰 Monthly Charges</div>", unsafe_allow_html=True)
+            monthly = st.number_input('', 0.0, 200.0, 70.0)
+
+            st.markdown("<div class='pred-card'>💵 Total Charges</div>", unsafe_allow_html=True)
+            total = st.number_input('', 0.0, 10000.0, 2500.0)
+        with c2:
+            st.markdown("<div class='pred-card'>📄 Contract Type</div>", unsafe_allow_html=True)
+            contract = st.selectbox('', ['Month-to-month', 'One year', 'Two year'])
+
+            st.markdown("<div class='pred-card'>💳 Payment Method</div>", unsafe_allow_html=True)
+            payment = st.selectbox('', ['Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)'])
+
+            st.markdown("<div class='pred-card'>🌐 Internet Service</div>", unsafe_allow_html=True)
+            internet = st.selectbox('', ['DSL', 'Fiber optic', 'No'])
+
+        predict_btn = st.form_submit_button("✅ Predict Now", help="Click to see prediction")
+
+    if predict_btn:
         input_df = pd.DataFrame({
             'tenure': [tenure],
             'MonthlyCharges': [monthly],
@@ -136,4 +163,3 @@ with tab2:
 
 # Footer
 st.markdown("<div class='footer'>Built with ❤️ by Sudhakardamarasingi</div>", unsafe_allow_html=True)
-
