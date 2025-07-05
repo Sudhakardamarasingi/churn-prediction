@@ -78,7 +78,7 @@ a.footer-link {{
 
 # Sidebar branding
 with st.sidebar:
-    st.markdown("##Sudhakardamarasingi")
+    st.markdown("Sudhakardamarasingi")
     st.markdown("Customer Churn Prediction App")
     st.markdown("[View on GitHub](https://github.com/Sudhakardamarasingi/churn-prediction)")
 
@@ -100,7 +100,7 @@ model, scaler, model_columns = load_model()
 page = st.sidebar.radio("Navigation", ["🏠 Home", "📊 Insights"])
 
 # Header
-st.markdown(f"<div class='big-title'>⚡ Telecom Customer Churn Dashboard</div>", unsafe_allow_html=True)
+st.markdown(f"<div class='big-title'>Telecom Customer Churn Dashboard</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Understand why customers churn & predict risk instantly.</div>", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
