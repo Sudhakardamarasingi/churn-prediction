@@ -5,26 +5,16 @@ import plotly.express as px
 import pickle
 
 # Page config
-st.set_page_config(page_title="📊 Churn Dashboard", page_icon="📊", layout="wide")
+st.set_page_config(page_title="⚡ Telecom Churn Dashboard", page_icon="⚡", layout="wide")
 
-# Sidebar theme toggle
-theme = st.sidebar.radio("🎨 Choose Theme", ["Light", "Dark"])
+# Colors
+primary_bg = "#0d1117"
+card_bg = "#161b22"
+text_color = "#f0f6fc"
+accent = "#00e1ff"
+shadow = "0px 0px 10px rgba(0,225,255,0.5)"  # neon glow
 
-# Theme colors
-if theme == "Dark":
-    primary_bg = "#0d1117"
-    card_bg = "#161b22"
-    text_color = "#f0f6fc"
-    accent = "#3b82f6"
-    shadow = "rgba(255,255,255,0.05)"
-else:
-    primary_bg = "#f9fafb"
-    card_bg = "#ffffff"
-    text_color = "#000000"
-    accent = "#2563eb"
-    shadow = "rgba(0,0,0,0.1)"
-
-# Custom CSS for cards & inputs
+# Custom CSS for neon cards & modern look
 st.markdown(f"""
 <style>
 body, .stApp {{
@@ -40,22 +30,20 @@ body, .stApp {{
     background-color: {card_bg};
     padding:20px;
     border-radius:12px;
-    box-shadow: 0px 2px 8px {shadow};
+    box-shadow: 0 0 10px rgba(0,225,255,0.2);
     text-align:center;
 }}
 .pred-card {{
     background-color: {card_bg};
     padding:15px 20px;
     border-radius:12px;
-    box-shadow: 0px 2px 8px {shadow};
     margin-bottom:10px;
-}}
-input, select, textarea {{
-    border-radius:8px !important;
+    border: 1px solid {accent};
+    box-shadow: {shadow};
 }}
 .big-btn > button {{
     background-color: {accent};
-    color: white;
+    color: black;
     width: 100%;
     padding: 0.75em;
     font-size: 16px;
@@ -85,8 +73,8 @@ data = load_data()
 model, scaler, model_columns = load_model()
 
 # Header
-st.markdown(f"<div class='big-title'>📊 Telecom Customer Churn Dashboard</div>", unsafe_allow_html=True)
-st.caption("Explore churn trends & predict churn with a modern SaaS interface.")
+st.markdown(f"<div class='big-title'>⚡ Telecom Customer Churn Dashboard</div>", unsafe_allow_html=True)
+st.caption("Premium dark dashboard to explore churn and predict with neon-style input cards.")
 
 # Metrics
 churn_rate = (data['Churn'].value_counts(normalize=True) * 100).get('Yes', 0)
@@ -104,20 +92,24 @@ tab1, tab2 = st.tabs(["📊 EDA & Insights", "🔮 Predict Churn"])
 with tab1:
     st.subheader("✅ Churn Distribution")
     fig1 = px.histogram(data, x='Churn', color='Churn', color_discrete_sequence=['#FF6B6B','#4ECDC4'])
+    fig1.update_layout(paper_bgcolor=primary_bg, plot_bgcolor=primary_bg, font_color=text_color)
     st.plotly_chart(fig1, use_container_width=True)
 
     st.subheader("💳 Churn by Payment Method")
     churn_payment = data.groupby('PaymentMethod')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
     fig2 = px.bar(churn_payment.sort_values(), orientation='h', color=churn_payment, color_continuous_scale='blues')
+    fig2.update_layout(paper_bgcolor=primary_bg, plot_bgcolor=primary_bg, font_color=text_color)
     st.plotly_chart(fig2, use_container_width=True)
 
     st.subheader("📑 Churn by Contract Type")
     churn_contract = data.groupby('Contract')['Churn'].value_counts(normalize=True).unstack()['Yes']*100
     fig3 = px.bar(x=churn_contract.index, y=churn_contract.values, color=churn_contract.values, color_continuous_scale='teal')
+    fig3.update_layout(paper_bgcolor=primary_bg, plot_bgcolor=primary_bg, font_color=text_color)
     st.plotly_chart(fig3, use_container_width=True)
 
 with tab2:
-    st.subheader("✨ Predict if customer will churn")
+    st.subheader("🔮 Predict if customer will churn")
+
     with st.form("predict_form"):
         c1, c2 = st.columns(2)
         with c1:
@@ -139,7 +131,7 @@ with tab2:
             st.markdown("<div class='pred-card'>🌐 Internet Service</div>", unsafe_allow_html=True)
             internet = st.selectbox('', ['DSL', 'Fiber optic', 'No'])
 
-        predict_btn = st.form_submit_button("✅ Predict Now", help="Click to see prediction")
+        predict_btn = st.form_submit_button("✨ Predict Now")
 
     if predict_btn:
         input_df = pd.DataFrame({
