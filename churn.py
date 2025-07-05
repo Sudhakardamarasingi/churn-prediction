@@ -7,14 +7,14 @@ import pickle
 # Page config
 st.set_page_config(page_title="⚡ Telecom Churn Dashboard", page_icon="⚡", layout="wide")
 
-# Colors
+# Dark theme colors
 primary_bg = "#0d1117"
 card_bg = "#161b22"
 text_color = "#f0f6fc"
 accent = "#00e1ff"
 shadow = "0px 0px 10px rgba(0,225,255,0.5)"  # neon glow
 
-# Custom CSS for neon cards & modern look
+# Custom CSS
 st.markdown(f"""
 <style>
 body, .stApp {{
@@ -148,9 +148,17 @@ with tab2:
         input_df = input_df[model_columns]
         pred = model.predict(scaler.transform(input_df))[0]
         prob = model.predict_proba(scaler.transform(input_df))[0][1]*100
-        if pred == 1:
-            st.error(f"⚠️ Likely to churn! (Prob: {prob:.1f}%)")
+
+        # Human-friendly output
+        if prob > 70:
+            st.error(f"⚠ **High churn risk!** Estimated risk: **{prob:.1f}%**.\n\n"
+                     f"👉 Customer likely to churn. Consider offering a loyalty discount or contacting them proactively.")
+        elif prob > 40:
+            st.warning(f"⚠ **Medium churn risk**: **{prob:.1f}%**.\n\n"
+                       f"👉 Keep an eye on this customer, consider engagement strategies.")
         else:
-            st.success(f"✅ Not likely to churn (Prob: {100 - prob:.1f}%)")
+            st.success(f"✅ **Low churn risk**: **{prob:.1f}%**.\n\n"
+                       f"Customer likely to stay. Continue with current retention approach.")
 
-
+# Footer
+st.markdown("<div class='footer'>Built with ❤️ by Sudhakardamarasingi</div>", unsafe_allow_html=True)
