@@ -1,0 +1,95 @@
+<svg width="1280" height="320" viewBox="0 0 1280 320" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="40%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#0b1120"/>
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="50%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="320" fill="url(#bgGradient)"/>
+
+  <!-- Soft blobs -->
+  <circle cx="220" cy="260" r="200" fill="#22c55e" opacity="0.10"/>
+  <circle cx="1040" cy="60" r="200" fill="#0ea5e9" opacity="0.15"/>
+  <circle cx="780" cy="260" r="170" fill="#6366f1" opacity="0.12"/>
+
+  <!-- Stylized chart / churn visualization -->
+  <g transform="translate(260, 90)" opacity="0.9">
+    <!-- Grid lines -->
+    <g stroke="#1f2937" stroke-width="1">
+      <line x1="0" y1="120" x2="420" y2="120"/>
+      <line x1="0" y1="80" x2="420" y2="80"/>
+      <line x1="0" y1="40" x2="420" y2="40"/>
+    </g>
+
+    <!-- Bars -->
+    <g>
+      <rect x="10"  y="70"  width="32" height="50" fill="#22c55e" rx="4"/>
+      <rect x="70"  y="55"  width="32" height="65" fill="#22c55e" rx="4"/>
+      <rect x="130" y="90"  width="32" height="30" fill="#22c55e" rx="4"/>
+      <rect x="190" y="40"  width="32" height="80" fill="#e11d48" rx="4"/>
+      <rect x="250" y="60"  width="32" height="60" fill="#e11d48" rx="4"/>
+      <rect x="310" y="95"  width="32" height="25" fill="#22c55e" rx="4"/>
+      <rect x="370" y="110" width="32" height="10" fill="#22c55e" rx="4"/>
+    </g>
+
+    <!-- Line curve -->
+    <path d="M 10 110 C 80 40, 200 65, 280 50 S 390 70, 420 55"
+          fill="none" stroke="url(#accentGradient)" stroke-width="3" />
+
+    <!-- Churn arrow -->
+    <path d="M 210 35 L 230 12 L 250 35" fill="none" stroke="#e11d48" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 230 12 L 230 52" fill="none" stroke="#e11d48" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Circular icon on left -->
+  <g transform="translate(80, 80)" filter="url(#softGlow)">
+    <circle cx="80" cy="80" r="64" fill="#020617" stroke="url(#accentGradient)" stroke-width="3"/>
+    <!-- Donut segments -->
+    <path d="M80,28 A52,52 0 0,1 125,52" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round"/>
+    <path d="M125,52 A52,52 0 0,1 122,120" fill="none" stroke="#e11d48" stroke-width="6" stroke-linecap="round"/>
+    <path d="M122,120 A52,52 0 0,1 55,120" fill="none" stroke="#0ea5e9" stroke-width="6" stroke-linecap="round"/>
+    <path d="M55,120 A52,52 0 0,1 80,28" fill="none" stroke="#a855f7" stroke-width="6" stroke-linecap="round"/>
+    <!-- Inner dot -->
+    <circle cx="80" cy="80" r="6" fill="#f9fafb"/>
+  </g>
+
+  <!-- Title & text -->
+  <text x="260" y="135" fill="#e5e7eb"
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="34" font-weight="700">
+    Customer Churn Prediction
+  </text>
+
+  <text x="260" y="175" fill="#9ca3af"
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="18">
+    Machine learning pipeline to detect at-risk customers using behavioral and account data.
+  </text>
+
+  <text x="260" y="210" fill="#a5b4fc"
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="16">
+    Live apps: Streamlit · Hugging Face Space
+  </text>
+
+  <text x="260" y="240" fill="#6b7280"
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="14">
+    Built with ❤️ by Sudhakar Damarasingi · Python · scikit-learn · Streamlit
+  </text>
+</svg>
