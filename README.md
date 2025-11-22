@@ -1,68 +1,61 @@
-# 📊 Customer Churn Prediction Project  
+<p align="center">
+  <img src="https://img.shields.io/badge/Project-Customer%20Churn%20Prediction-0f172a?style=for-the-badge" alt="Customer Churn Prediction" />
+</p>
 
-This project is a Machine Learning application built to predict *customer churn*.  
-It helps businesses identify customers who are likely to leave, using historical customer data and a trained ML model.  
-
----
-## 🌐 Live Demo  
-Try out the deployed project here:  
-
-- 🚀 *Streamlit App* → [Customer Churn Prediction](https://sudhakardamarasingi.streamlit.app/)
-- 🤗 *Hugging Face Space* → [Churn Prediction](https://huggingface.co/spaces/Madmax003/churn_prediction2)
-
----
-
-
-## 📂 Files in this Repository
-- *app.py* → Streamlit/Flask app for making predictions.  
-- *churn_dataset.csv* → Dataset used for training and testing.  
-- *advanced_churn_model.pkl* → Pre-trained ML model.  
-- *requirements.txt* → Python dependencies.  
-- *README.md* → Project documentation.  
-- *LICENSE* → MIT License.  
-- *.gitignore* → Ignored files.  
+<p align="center">
+  <a href="https://sudhakardamarasingi.streamlit.app/">
+    <img src="https://img.shields.io/badge/Live_App-Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white" alt="Streamlit App" />
+  </a>
+  <a href="https://huggingface.co/spaces/Madmax003/churn_prediction2">
+    <img src="https://img.shields.io/badge/Live_Space-HuggingFace-ffcc00?style=flat-square&logo=huggingface&logoColor=black" alt="Hugging Face Space" />
+  </a>
+  <img src="https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/scikit--learn-ML%20Model-F7931E?style=flat-square&logo=scikitlearn&logoColor=white" alt="scikit-learn" />
+  <img src="https://img.shields.io/badge/Status-Production%20Ready-brightgreen?style=flat-square" alt="Status" />
+</p>
 
 ---
 
-## 🔍 Project Workflow
-1. *Data Collection* – Customer information such as demographics, services used, and billing details are gathered.  
-2. *Data Preprocessing* – The dataset is cleaned, missing values are handled, and categorical variables are encoded.  
-3. *Model Training* – A machine learning model is trained on historical customer data to learn patterns of churn.  
-4. *Model Evaluation* – The model is tested using metrics like Accuracy, Precision, Recall, and F1-score.  
-5. *Model Deployment* – The trained model is saved (.pkl file) and integrated into an application (app.py) for real-time predictions.  
-6. *Prediction* – Users can provide customer details in the app, and the system will predict whether the customer is likely to churn.  
+# 📊 Customer Churn Prediction
+
+This project is an **end-to-end Machine Learning application** that predicts whether a customer is likely to **churn (leave a service)** based on historical behavior and account information.
+
+It is designed to help businesses:
+
+- Identify **high-risk customers**
+- Take **proactive retention actions**
+- Understand **drivers of churn** using model insights
+
+You can try the live app here:
+
+- 🚀 **Streamlit App** → [Customer Churn Prediction](https://sudhakardamarasingi.streamlit.app/)  
+- 🤗 **Hugging Face Space** → [Churn Prediction Space](https://huggingface.co/spaces/Madmax003/churn_prediction2)
 
 ---
 
-## 🚀 How to Run the Project
-1. Clone the repository.  
-2. Install required dependencies using requirements.txt.  
-3. Run the application:  
-   - With *Streamlit* → streamlit run app.py  
-   - With *Flask* → python app.py  
-4. Interact with the app by entering customer details and get churn prediction results instantly.  
+## 🧠 Problem Statement
+
+Customer churn is a critical issue for subscription-based and service-based businesses.  
+Acquiring a new customer is often **more expensive** than retaining an existing one.
+
+This project builds a **classification model** that predicts whether a customer will churn based on:
+
+- Demographics  
+- Services subscribed  
+- Tenure  
+- Billing and payment patterns  
+- Usage and engagement signals  
 
 ---
 
-## 🛠 Tools & Technologies Used
-- *Python* – For data preprocessing and ML development.  
-- *scikit-learn* – For machine learning model building.  
-- *pandas & numpy* – For data handling.  
-- *Streamlit/Flask* – For deployment and interactive app.  
-- *Matplotlib/Seaborn* – For Exploratory Data Analysis (EDA).  
+## 🧱 Project Structure
 
----
-
-## 📌 Author
-Created by *Sudhakar Damarasingi*  
-Feel free to connect and share feedback!  
-
----
-
-## 🙋‍♂ About Me
-*Sudhakar Damarasingi*  
-AI/ML Engineer | Data Science  
-🔗 [GitHub](https://github.com/Sudhakardamarasingi)  
-🔗 [LinkedIn](https://linkedin.com/in/sudhakar-damarasingi)  
-🔗 [Gmail](damarasingisudhakar@gmail.com)
----
+```bash
+.
+├── app.py                  # Streamlit / Flask app for serving predictions
+├── churn_dataset.csv       # Dataset used for training and evaluation
+├── advanced_churn_model.pkl# Trained ML model (serialized)
+├── requirements.txt        # Python dependencies
+├── README.md               # Project documentation
+├── LICENSE                 # License (MIT)
+└── .gitignore              # Git ignore rules
