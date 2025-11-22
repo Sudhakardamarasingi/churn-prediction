@@ -1,4 +1,9 @@
 <p align="center">
+  <img src="banner.svg" alt="Customer Churn Prediction Banner" />
+</p>
+
+
+<p align="center">
   <img src="https://img.shields.io/badge/Project-Customer%20Churn%20Prediction-0f172a?style=for-the-badge" alt="Customer Churn Prediction" />
 </p>
 
@@ -11,7 +16,7 @@
   </a>
   <img src="https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
   <img src="https://img.shields.io/badge/scikit--learn-ML%20Model-F7931E?style=flat-square&logo=scikitlearn&logoColor=white" alt="scikit-learn" />
-  <img src="https://img.shields.io/badge/Status-Production%20Ready-brightgreen?style=flat-square" alt="Status" />
+  <img src="https://img.shields.io/badge/Made_by-Sudhakar_Damarasingi-6b21a8?style=flat-square" alt="Author" />
 </p>
 
 ---
